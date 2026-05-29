@@ -96,7 +96,7 @@ app.get('/api/admin/overview', auth, requireRole('admin'), (_req, res) => {
 app.get('/api/dashboard', auth, (req, res) => {
   const habits = db.prepare('SELECT * FROM habits WHERE user_id = ? ORDER BY id DESC').all(req.user.sub);
   const journal = db.prepare('SELECT * FROM journal WHERE user_id = ? ORDER BY id DESC LIMIT 6').all(req.user.sub);
-  const completedToday = db.prepare("SELECT COUNT(*) AS total FROM checkins WHERE user_id = ? AND completed_at = date('now')").get(req.user.sub).total;
+  const completedToday = db.prepare("SELECT COUNT(*) AS total FROM checkins c JOIN habits h ON c.habit_id = h.id WHERE h.user_id = ? AND c.completed_on = date('now')").get(req.user.sub).total;
   res.json({
     summary: {
       activeHabits: habits.length,
